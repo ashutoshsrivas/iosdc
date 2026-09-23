@@ -101,14 +101,19 @@
     var page = currentPage();
     var slug = currentCohortSlug();
 
+    // The nav is always Home · Highlights · Cohorts. The cohort sub-items are
+    // dynamic, but the three top-level links are fixed, so the menu doesn't
+    // change shape depending on what happens to be published.
     list.innerHTML = '';
     list.appendChild(buildItem('Home', 'index.html', page === 'index.html'));
+    list.appendChild(buildItem('Highlights', 'highlights.html', page === 'highlights.html'));
 
-    if (nav && nav.highlights) {
-      list.appendChild(buildItem('Highlights', 'highlights.html', page === 'highlights.html'));
-    }
-    if (nav && nav.cohorts && nav.cohorts.length) {
-      list.appendChild(buildCohorts(nav.cohorts, page, slug));
+    var cohorts = (nav && nav.cohorts) || [];
+    if (cohorts.length) {
+      list.appendChild(buildCohorts(cohorts, page, slug));
+    } else {
+      // No visible cohorts yet — a plain link; cohort.html says so itself.
+      list.appendChild(buildItem('Cohorts', 'cohort.html', page === 'cohort.html'));
     }
 
     // The hamburger is hidden at >=992px by default in this theme; the
@@ -131,9 +136,8 @@
     var page = currentPage();
     [
       ['Home', 'index.html'],
-      ['About', 'about.html'],
-      ['Events', 'events.html'],
-      ['Contact', 'contact.html'],
+      ['Highlights', 'highlights.html'],
+      ['Cohorts', 'cohort.html'],
     ].forEach(function (item) {
       list.appendChild(buildItem(item[0], item[1], page === item[1]));
     });
