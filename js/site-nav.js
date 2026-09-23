@@ -117,14 +117,39 @@
     if (toggle) toggle.classList.add('header__menu-toggle--always');
   }
 
-  function init() {
-    // Render Home immediately so the menu is never empty while the API loads.
-    render({ highlights: false, cohorts: [] });
+  // Pages that ship with a hand-written nav in their markup. If the API is
+  // down we leave that alone — losing real links would be worse than showing
+  // a slightly stale menu. Only a page with an empty list gets the fallback.
+  function fallback() {
+    var list = document.querySelector('.navigation__list');
+    if (!list) return;
+    // Count links, not child nodes: index.html's list still holds an empty <li>
+    // left over from its commented-out menu, which is not a usable nav.
+    if (list.querySelectorAll('a').length > 0) return;
 
+    list.innerHTML = '';
+    var page = currentPage();
+    [
+      ['Home', 'index.html'],
+      ['About', 'about.html'],
+      ['Events', 'events.html'],
+      ['Contact', 'contact.html'],
+    ].forEach(function (item) {
+      list.appendChild(buildItem(item[0], item[1], page === item[1]));
+    });
+
+    var toggle = document.querySelector('.header__menu-toggle');
+    if (toggle) toggle.classList.add('header__menu-toggle--always');
+  }
+
+  function init() {
     fetch(API + '/nav', { credentials: 'omit' })
       .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (nav) { if (nav) render(nav); })
-      .catch(function () { /* keep the Home-only fallback */ });
+      .then(function (nav) {
+        if (nav) render(nav);
+        else fallback();
+      })
+      .catch(fallback);
   }
 
   if (document.readyState === 'loading') {
