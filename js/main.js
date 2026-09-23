@@ -497,16 +497,50 @@ $(window).on('load', function() {
 		return re.test(String(email).toLowerCase());
 	}
 
-	function mail(event, php) {
+	function mail(event, php, onDone) {
 		event.preventDefault ? event.preventDefault() : event.returnValue = false;
+		var form = event.target;
 		var req = new XMLHttpRequest();
 		req.open('POST', php, true);
 
-		req.onerror = function () {
-			console.log("Ошибка отправки запроса");
+		function finish(ok, message) {
+			if (typeof onDone === 'function') { onDone(ok, message); }
+		}
+
+		req.onload = function () {
+			var res = null;
+			try { res = JSON.parse(req.responseText); } catch (err) { res = null; }
+
+			if (req.status === 200 && (res === null || res.ok !== false)) {
+				if (form && typeof form.reset === 'function') { form.reset(); }
+				finish(true);
+			} else {
+				finish(false, (res && res.error) || 'Could not send your message. Please email profsg.mba@geu.ac.in directly.');
+			}
 		};
 
-		req.send(new FormData(event.target));
+		req.onerror = function () {
+			finish(false, 'Network error — please check your connection, or email profsg.mba@geu.ac.in directly.');
+		};
+
+		req.send(new FormData(form));
+	}
+
+	// Renders the send result under the form's submit button.
+	function showFormStatus(form, ok, message) {
+		var $form = $(form),
+				$status = $form.find('.js-form-status');
+
+		if ($status.length === 0) {
+			$status = $('<div class="js-form-status" role="status" aria-live="polite" style="margin-top:15px;font-size:15px;"></div>');
+			$form.append($status);
+		}
+
+		if (ok) {
+			$status.css('color', '#2e7d32').text('Thanks — your message has been sent.');
+		} else {
+			$status.css('color', '#c62828').text(message);
+		}
 	}
 
 	function checkValid(errs) {
@@ -547,24 +581,31 @@ $(window).on('load', function() {
 			}
 		});
 
-		if (isValid) {
-			form.submit(function () {
-				mail(event, 'php/mail.php');
+		// Always handle the send ourselves so we can react to the server's reply.
+		e.preventDefault();
 
+		if (!isValid) {
+			return;
+		}
+
+		that.prop('disabled', true);
+
+		mail({ target: form[0], preventDefault: function () {} }, 'php/mail.php', function (ok, message) {
+			that.prop('disabled', false);
+
+			if (ok) {
 				$.fancybox.open({
 					src: '#thanks',
 					type: 'inline',
 					touch: false,
 					scrolling: 'no'
 				});
-			});
-
-			setTimeout(function () {
-				form.off('submit');
-			}, 100);
-		} else {
-			e.preventDefault();
-		}
+				showFormStatus(form, true);
+			} else {
+				// Don't claim success when the message never went out.
+				showFormStatus(form, false, message);
+			}
+		});
 	});
 
 	$('.js-form-validate .field').on('focusout keyup change', function () {

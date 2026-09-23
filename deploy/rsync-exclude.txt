@@ -1,0 +1,38 @@
+# Never publish these to the static web root.
+# ios-sdp/ stays part of the project but deploys via its own pipeline
+# (ios-sdp/DEPLOYMENT.md -> pm2 on ports 3100/4100 behind /bootcamp and /sdp).
+ios-sdp/
+node_modules/
+
+# Secrets and keys
+*.pem
+*.ppk
+*.key
+*.crt
+*.p12
+.env
+.env.*
+mail.ini
+mail.ini.example
+
+# Version control and editor state
+.git
+.git/
+.gitignore
+.gitattributes
+.vscode/
+.claude/
+
+# Local cruft and build artifacts
+.DS_Store
+Archive.zip
+*.zip
+*.tar.gz
+*.bak
+a 1.sv
+
+# Repo docs — not web content
+README.md
+CLAUDE.md
+DEPLOYMENT.md
+deploy/

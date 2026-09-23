@@ -1,0 +1,27 @@
+; Contact-form SMTP credentials for iosdc.geu.ac.in
+;
+; Copy this file to a location OUTSIDE the web root and fill it in:
+;
+;   sudo mkdir -p /etc/iosdc
+;   sudo cp php/mail.ini.example /etc/iosdc/mail.ini
+;   sudo nano /etc/iosdc/mail.ini
+;   sudo chown root:www-data /etc/iosdc/mail.ini
+;   sudo chmod 640 /etc/iosdc/mail.ini      # readable by Apache, nobody else
+;
+; php/mail.php reads environment variables first, then this file.
+; Never commit the filled-in version, and never place it under /var/www.
+
+SMTP_HOST = "smtp.gmail.com"
+SMTP_PORT = "587"
+SMTP_USER = "your-account@geu.ac.in"
+
+; For Google Workspace / Gmail this must be a 16-character App Password
+; (myaccount.google.com -> Security -> App passwords), NOT the login password.
+SMTP_PASS = "xxxxxxxxxxxxxxxx"
+
+; Envelope sender. Must be on a domain whose SPF/DMARC records authorise this
+; SMTP host, otherwise the mail will be rejected or land in spam.
+MAIL_FROM = "no-reply@geu.ac.in"
+
+; Where contact-form submissions are delivered.
+MAIL_TO   = "profsg.mba@geu.ac.in"
