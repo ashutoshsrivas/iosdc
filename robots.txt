@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Infrastructure and non-content paths
+Disallow: /.git/
+Disallow: /php/
+Disallow: /js/
+Disallow: /css/
+Disallow: /fonts/
+
+Sitemap: https://iosdc.geu.ac.in/sitemap.xml
