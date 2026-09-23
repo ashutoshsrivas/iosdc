@@ -1262,16 +1262,22 @@
     <script src="js/main.js"></script>
     <script src="js/site-nav.js"></script>
     <script>
-      // Dynamically set logo based on header background
-      const header = document.querySelector("header");
-      const logo = document.querySelector(".logo img");
-      if (header && logo) {
-        if (header.classList.contains("header--white")) {
-          logo.src = "img/logo/geu.png";
-        } else {
-          logo.src = "img/logo/geu-dark.png";
+      // Dynamically set logo based on header background.
+      // Wrapped in an IIFE: js/main.js already declares a global `var header`,
+      // so a top-level `const header` here threw "Identifier 'header' has
+      // already been declared" and aborted this whole block, leaving the logo
+      // unswapped.
+      (function () {
+        var headerEl = document.querySelector("header");
+        var logo = document.querySelector(".logo img");
+        if (headerEl && logo) {
+          if (headerEl.classList.contains("header--white")) {
+            logo.src = "img/logo/geu.png";
+          } else {
+            logo.src = "img/logo/geu-dark.png";
+          }
         }
-      }
+      })();
     </script>
   </body>
 </html>
