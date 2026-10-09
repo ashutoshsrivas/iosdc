@@ -24,6 +24,21 @@
     return node;
   }
 
+  // The cohort's banner image, inserted above the app grid when one is set.
+  function renderBanner(cohort) {
+    var existing = document.getElementById('cohort-banner');
+    if (existing) existing.remove();
+    if (!cohort.image) return;
+
+    var figure = el('figure', 'cohort-banner');
+    figure.id = 'cohort-banner';
+    var img = document.createElement('img');
+    img.src = cohort.image;
+    img.alt = cohort.name;
+    figure.appendChild(img);
+    root.parentNode.insertBefore(figure, root);
+  }
+
   function state(message) {
     root.innerHTML = '';
     root.appendChild(el('div', 'content-page__state', message));
@@ -98,6 +113,7 @@
   function render(cohort) {
     if (titleEl) titleEl.textContent = cohort.name;
     if (taglineEl && cohort.tagline) taglineEl.textContent = cohort.tagline;
+    renderBanner(cohort);
     document.title = cohort.name + ' | iOS Development Centre, Graphic Era University';
 
     if (!cohort.apps || !cohort.apps.length) {
