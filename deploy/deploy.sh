@@ -39,7 +39,11 @@ rsync -rlptv --checksum \
   --rsync-path="sudo rsync" \
   -e "ssh -i $KEY" \
   ./ "$HOST:$DOCROOT/"
-ssh -i "$KEY" "$HOST" "sudo chown -R www-data:www-data $DOCROOT"
+# rsync -p copies the local directory modes, which on a laptop are often 700 —
+# that leaves the docroot readable only by its owner. Normalise explicitly.
+ssh -i "$KEY" "$HOST" "sudo find $DOCROOT -type d -exec chmod 755 {} + && \
+  sudo find $DOCROOT -type f -exec chmod 644 {} + && \
+  sudo chown -R www-data:www-data $DOCROOT && echo '  perms normalised'"
 
 echo "==> [4/6] Quarantining exposed files out of the webroot"
 ssh -i "$KEY" "$HOST" '
